@@ -20,7 +20,14 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import BarChartIcon from "@material-ui/icons/BarChart";
 import LayersIcon from "@material-ui/icons/Layers";
-import { LocalOffer, AccountBalance, InfoSharp, PersonPinCircle, VerifiedUser } from "@material-ui/icons";
+import {
+    LocalOffer,
+    AccountBalance,
+    InfoSharp,
+    PersonPinCircle,
+    VerifiedUser
+} from "@material-ui/icons";
+import BusinessIcon from "@material-ui/icons/Business";
 import Products from "./products";
 import Overview from "./overview";
 import Customers from "./customers";
@@ -51,8 +58,8 @@ export default function Dashboard(props) {
         switch (value) {
             case 1:
                 return <Overview />;
-            case 2:
-                return <Products />;
+            // case 2:
+            //     return <Products />;
             case 3:
                 return <Customers />;
             case 4:
@@ -107,7 +114,7 @@ export default function Dashboard(props) {
                     </ListItemIcon>
                     <ListItemText primary="Dashboard" />
                 </ListItem>
-                <ListItem
+                {/* <ListItem
                     style={value === 2 ? { backgroundColor: "#505569" } : {}}
                     button
                     onClick={() => changeContent(2)}
@@ -116,7 +123,7 @@ export default function Dashboard(props) {
                         <ShoppingCartIcon />
                     </ListItemIcon>
                     <ListItemText primary="Products" />
-                </ListItem>
+                </ListItem> */}
                 <ListItem
                     style={value === 3 ? { backgroundColor: "#505569" } : {}}
                     button
@@ -147,26 +154,40 @@ export default function Dashboard(props) {
                     </ListItemIcon>
                     <ListItemText primary="Transactions" />
                 </ListItem>
-                <ListItem
-                    style={value === 6 ? { backgroundColor: "#505569" } : {}}
-                    button
-                    onClick={() => changeContent(6)}
-                >
-                    <ListItemIcon className={classes.listStyle}>
-                        <LocalOffer />
-                    </ListItemIcon>
-                    <ListItemText primary="Offers" />
-                </ListItem>
-                <ListItem
-                    style={value === 7 ? { backgroundColor: "#505569" } : {}}
-                    button
-                    onClick={() => changeContent(7)}
-                >
-                    <ListItemIcon className={classes.listStyle}>
-                        <InfoSharp />
-                    </ListItemIcon>
-                    <ListItemText primary="News" />
-                </ListItem>
+                {getUserData().role === "super-admin" ? (
+                    <div>
+                        <ListItem
+                            style={value === 6 ? { backgroundColor: "#505569" } : {}}
+                            button
+                            onClick={() => changeContent(6)}
+                        >
+                            <ListItemIcon className={classes.listStyle}>
+                                <LocalOffer />
+                            </ListItemIcon>
+                            <ListItemText primary="Offers" />
+                        </ListItem>
+                        <ListItem
+                            style={value === 7 ? { backgroundColor: "#505569" } : {}}
+                            button
+                            onClick={() => changeContent(7)}
+                        >
+                            <ListItemIcon className={classes.listStyle}>
+                                <InfoSharp />
+                            </ListItemIcon>
+                            <ListItemText primary="News" />
+                        </ListItem>
+                        <ListItem
+                            style={value === 8 ? { backgroundColor: "#505569" } : {}}
+                            button
+                            onClick={() => changeContent(8)}
+                        >
+                            <ListItemIcon className={classes.listStyle}>
+                                <BusinessIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Vendor" />
+                        </ListItem>
+                    </div>
+                ) : null}
             </div>
         );
     };

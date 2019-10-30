@@ -2,13 +2,46 @@ import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import MaterialTable from "material-table";
-import { Button } from "@material-ui/core";
+import { Button, Avatar } from "@material-ui/core";
 import { createAxiosInstance, getUserData } from "../util";
 import CashierRegistrationModal from "../components/cashierRegisteraton";
 import CashierModal from "../components/cashier";
+import { red } from "@material-ui/core/colors";
+
+const nameStyle = {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center"
+};
+
+const nameAvatar = {
+    backgroundColor: red[500],
+    marginRight: "10px",
+    marginLeft: "10px"
+};
 
 const columns = [
-    { field: "name", title: "Name", minWidth: 170 },
+    {
+        field: "name",
+        title: "Name",
+        minWidth: 350,
+        render: rowData => (
+            <div style={nameStyle}>
+                <Avatar style={nameAvatar}>{`${rowData.name
+                    .split(" ")[0]
+                    .substr(0, 1)
+                    .toUpperCase()} 
+                ${rowData.name
+                    .split(" ")[1]
+                    .substr(0, 1)
+                    .toUpperCase()}`}</Avatar>
+                <p style={{ fontWeight: "bold" }}>{rowData.name}</p>
+            </div>
+        ),
+        cellStyle: {
+            padding: "0px"
+        }
+    },
     { field: "iam", title: "IAM", minWidth: 100 },
     {
         field: "lastLogon",
@@ -72,6 +105,7 @@ export default function Cashiers() {
     const [saving, setSaving] = React.useState(false);
     const [saved, setSaved] = React.useState(false);
     const [error, setError] = React.useState(false);
+    const [edit, setEdit] = React.useState(false);
     const [cashier, setCashier] = React.useState({
         id: "",
         firstname: "",
@@ -167,11 +201,15 @@ export default function Cashiers() {
             });
     };
     const visibilityIconFontStyle = {
-        fontSize: 16,
+        fontSize: 18,
         color: "green"
     };
+    const editIconFontStyle = {
+        fontSize: 18,
+        color: "#070E2E"
+    };
     const deleteIconFontStyle = {
-        fontSize: 16,
+        fontSize: 18,
         color: "red"
     };
 
@@ -180,10 +218,22 @@ export default function Cashiers() {
             icon: "visibility",
             tooltip: "View",
             onClick: (event, rowData) => {
+                setEdit(false);
                 handleView(rowData.id);
             },
             iconProps: {
                 style: { ...visibilityIconFontStyle }
+            }
+        },
+        {
+            icon: "edit",
+            tooltip: "edit",
+            onClick: (event, rowData) => {
+                setEdit(true);
+                handleView(rowData.id);
+            },
+            iconProps: {
+                style: { ...editIconFontStyle }
             }
         }
     ];
@@ -207,6 +257,10 @@ export default function Cashiers() {
         }
     };
 
+    const sortByDate = _ => {
+        
+    };
+
     return (
         <Paper className={classes.root}>
             <div className={classes.tableWrapper}>
@@ -222,6 +276,7 @@ export default function Cashiers() {
                     >
                         Add Cashier
                     </Button>
+                    
                 </div>
                 <MaterialTable
                     title="Cashiers"
@@ -231,7 +286,8 @@ export default function Cashiers() {
                     localization={localizationOptions}
                     options={{
                         columnsButton: true,
-                        actionsColumnIndex: -1
+                        actionsColumnIndex: -1,
+                        exportButton: true
                     }}
                 />
                 <CashierRegistrationModal
@@ -253,6 +309,7 @@ export default function Cashiers() {
                     Update={cashierUpdate}
                     cashier={cashier}
                     updateCashier={cashierDetailsUpdate}
+                    edit={edit}
                 />
             </div>
         </Paper>

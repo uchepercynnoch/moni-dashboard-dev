@@ -18,12 +18,6 @@ const columns = [
         align: "right"
     },
     {
-        field: "loyaltyPercentage",
-        title: "Loyalty Percentage %",
-        minWidth: 170,
-        align: "right"
-    },
-    {
         field: "unitPrice",
         title: "Unit Price",
         minWidth: 170,

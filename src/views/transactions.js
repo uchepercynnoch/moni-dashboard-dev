@@ -2,14 +2,21 @@ import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import MaterialTable from "material-table";
-import LoyaltyIcon from "@material-ui/icons/Loyalty";
 import { Button, Chip } from "@material-ui/core";
 import { createAxiosInstance, getUserData } from "../util";
 import TransactionModal from "../components/transaction";
+import { DateRangePicker } from "react-dates";
+import Moment from "moment";
+import _ from "lodash";
 
 const columns = [
     { field: "transactionId", title: "Transaction Ref", minWidth: 170 },
-    { field: "dateOfTransaction", title: "Date of Transaction", minWidth: 100 },
+    {
+        field: "dateOfTransaction",
+        title: "Date of Transaction",
+        minWidth: 100,
+        render: rowData => Moment(rowData.dateOfTransaction).format("YYYY-MM-DD")
+    },
     {
         field: "servicedBy",
         title: "Cashier",
@@ -39,11 +46,7 @@ const columns = [
         field: "points",
         title: "Gems💎",
         minWidth: 170,
-        render: rowData => (
-            <div style={loyaltyTagStyle}>
-                {rowData.points}
-            </div>
-        )
+        render: rowData => <div style={loyaltyTagStyle}>{rowData.points}</div>
     }
 ];
 
@@ -89,7 +92,11 @@ export default function Transaction() {
     const classes = useStyles();
     const [openView, setOpenView] = React.useState(false);
     const [rows, setRows] = React.useState([]);
+    const [fallbackRows, setFallback] = React.useState([]);
     const [error, setError] = React.useState(false);
+    const [startDate, setStartDate] = React.useState(null);
+    const [endDate, setEndDate] = React.useState(null);
+    const [focused, setFocused] = React.useState(null);
     const [transaction, setTransaction] = React.useState({
         transactionId: "",
         dateOfTransaction: "",
@@ -108,7 +115,17 @@ export default function Transaction() {
                 res.data.forEach(data => {
                     transactions.push(createData(data));
                 });
-                setRows(transactions);
+                // Sort array by date
+                const sortedTransactions = _.orderBy(
+                    transactions,
+                    o => {
+                        return Moment(o.dateOfTransaction).format("YYYY-MM-DD");
+                    },
+                    ["desc"]
+                );
+                setEndDate(Moment(sortedTransactions[0].dateOfTransaction));
+                setFallback(sortedTransactions);
+                setRows(sortedTransactions);
             })
             .catch(error => {
                 console.log(error);
@@ -159,8 +176,40 @@ export default function Transaction() {
         }
     };
 
+    const sortByDate = (startDate, endDate) => {
+        setStartDate(startDate);
+        setEndDate(endDate);
+
+        if (!startDate || !endDate)
+            setRows(fallbackRows);
+
+        let result = _.filter(fallbackRows, data => {
+            const date = Moment(data.dateOfTransaction);
+            const start = Moment(startDate).format("YYYY-MM-DD");
+            const end = Moment(endDate).format("YYYY-MM-DD");
+            
+            console.log(`${Moment(data.dateOfTransaction).format("YYYY-MM-DD")} ${Moment(startDate).format("YYYY-MM-DD")} ${Moment(endDate).format("YYY-MM-DD")}`);
+            
+            return date.isBetween(start, end) || date.isSame(start) || date.isSame(end);
+        });
+        setRows(result);
+    };
+
     return (
         <Paper className={classes.root}>
+            <div>
+                <DateRangePicker
+                    startDate={startDate}
+                    startDateId="1"
+                    endDate={endDate}
+                    endDateId="2"
+                    onDatesChange={({ startDate, endDate }) => sortByDate(startDate, endDate)}
+                    focusedInput={focused}
+                    onFocusChange={focused => setFocused(focused)}
+                    enableOutsideDays={true}
+                    isOutsideRange={() => false}
+                />
+            </div>
             <div className={classes.tableWrapper}>
                 <MaterialTable
                     title="Transactions"

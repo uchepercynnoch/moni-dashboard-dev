@@ -92,7 +92,7 @@ const useStyles2 = makeStyles(theme => ({
     }
 }));
 
-export default function CashierRegistrationModal(props) {
+export default function VendorRegister(props) {
     const theme = useTheme();
     const classes = useStyles2();
     const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -105,12 +105,16 @@ export default function CashierRegistrationModal(props) {
 
     return (
         <div>
-            <Dialog open={props.open} onClose={() => props.Close()} aria-labelledby="responsive-dialog-title">
+            <Dialog
+                open={props.open}
+                onClose={() => props.Close()}
+                aria-labelledby="responsive-dialog-title"
+            >
                 <DialogTitle id="responsive-dialog-title">{"Create a new cashier account."}</DialogTitle>
                 <DialogContent>
                     <div className="horizontal-align">
                         <TextField
-                            className="text-input"
+                            className="form-input"
                             id="firstname"
                             value={firstname}
                             margin="normal"
@@ -121,7 +125,7 @@ export default function CashierRegistrationModal(props) {
                             variant="filled"
                         />
                         <TextField
-                            className="text-input"
+                            className="form-input"
                             id="lastname"
                             value={lastname}
                             margin="normal"
@@ -134,7 +138,7 @@ export default function CashierRegistrationModal(props) {
                     </div>
                     <div className="horizontal-align">
                         <TextField
-                            className="text-input"
+                            className="form-input"
                             id="phoneNumber"
                             value={phoneNumber}
                             margin="normal"
@@ -146,7 +150,7 @@ export default function CashierRegistrationModal(props) {
                         />
 
                         <TextField
-                            className="text-input"
+                            className="form-input"
                             id="password"
                             value={password}
                             margin="normal"

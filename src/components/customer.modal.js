@@ -6,7 +6,14 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import {
     TextField,
     Button,
-    Snackbar
+    Snackbar,
+    Paper,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody,
+    Typography
 } from "@material-ui/core";
 import "../styles/cashRegistration.css";
 import clsx from "clsx";
@@ -89,36 +96,30 @@ export default function CustomerModal(props) {
 
     return (
         <div>
-            <Dialog
-                // fullScreen={fullScreen}
-                open={props.open}
-                onClose={() => props.Close()}
-                aria-labelledby="responsive-dialog-title"
-            >
+            <Dialog open={props.open} onClose={() => props.Close()} aria-labelledby="responsive-dialog-title">
                 <DialogTitle id="responsive-dialog-title">{"Customer"}</DialogTitle>
                 <DialogContent>
                     <div className="horizontal-align">
                         <TextField
-                            className="form-input"
                             id="name"
                             label="Name"
                             value={props.customer.name}
                             margin="normal"
                             type="text"
                             variant="filled"
+                            className="text-input"
                             inputProps={{
                                 readOnly: Boolean(true)
                             }}
                         />
-                    </div>
-                    <div className="horizontal-align">
+
                         <TextField
-                            className="form-input"
                             id="email"
                             value={props.customer.email}
                             margin="normal"
                             label="Email"
                             type="text"
+                            className="text-input"
                             variant="filled"
                             inputProps={{
                                 readOnly: Boolean(true)
@@ -128,21 +129,21 @@ export default function CustomerModal(props) {
 
                     <div className="horizontal-align">
                         <TextField
-                            className="form-input"
                             id="gender"
                             label="Gender"
                             value={props.customer.gender}
                             margin="normal"
                             type="text"
                             variant="filled"
+                            className="text-input"
                             inputProps={{
                                 readOnly: Boolean(true)
                             }}
                         />
 
                         <TextField
-                            className="form-input"
                             id="loyaltyPoints"
+                            className="text-input"
                             value={props.customer.loyaltyPoints}
                             margin="none"
                             label="Gems💎"
@@ -152,6 +153,35 @@ export default function CustomerModal(props) {
                                 readOnly: Boolean(true)
                             }}
                         />
+                    </div>
+                    <div>
+                    <Typography component="h5">Transactions</Typography>
+                        <Paper>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Transaction Id</TableCell>
+                                        <TableCell>Items</TableCell>
+                                        <TableCell>Serviced By</TableCell>
+                                        <TableCell>type</TableCell>
+                                        <TableCell>Points</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {props.customer.transactions.map((transaction, key) => (
+                                        <TableRow key={key}>
+                                            <TableCell>{transaction.transactionId}</TableCell>
+                                            <TableCell>{transaction.items.map((item, key) => (
+                                                <p key={key}>{item.name}</p>
+                                            ))}</TableCell>
+                                            <TableCell>{transaction.servicedBy.iam}</TableCell>
+                                            <TableCell>{transaction.type}</TableCell>
+                                            <TableCell>{transaction.type === "gain" ? transaction.gainedPoints : transaction.deductedPoints}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </Paper>
                     </div>
 
                     <Snackbar
@@ -192,7 +222,6 @@ export default function CustomerModal(props) {
                     >
                         Close
                     </Button>
-                    
                 </DialogActions>
             </Dialog>
         </div>

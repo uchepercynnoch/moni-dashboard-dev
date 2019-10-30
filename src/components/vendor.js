@@ -3,8 +3,6 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { useTheme } from "@material-ui/core/styles";
 import {
     TextField,
     Button,
@@ -27,6 +25,12 @@ import IconButton from "@material-ui/core/IconButton";
 import SnackbarContent from "@material-ui/core/SnackbarContent";
 import WarningIcon from "@material-ui/icons/Warning";
 import { makeStyles } from "@material-ui/core/styles";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import Paper from "@material-ui/core/Paper";
 
 const variantIcon = {
     success: CheckCircleIcon,
@@ -92,86 +96,122 @@ const useStyles2 = makeStyles(theme => ({
     }
 }));
 
-export default function CashierRegistrationModal(props) {
-    const theme = useTheme();
+export default function Vendor(props) {
     const classes = useStyles2();
-    const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
-
-    const [firstname, setFirstName] = useState("");
-    const [lastname, setLastname] = useState("");
-    const [password, setPassword] = useState("");
-    const [phoneNumber, setPhoneNumber] = useState("");
-    const [gender, setGender] = useState("");
 
     return (
         <div>
             <Dialog open={props.open} onClose={() => props.Close()} aria-labelledby="responsive-dialog-title">
-                <DialogTitle id="responsive-dialog-title">{"Create a new cashier account."}</DialogTitle>
+                <DialogTitle id="responsive-dialog-title">{"Cashier Account"}</DialogTitle>
                 <DialogContent>
                     <div className="horizontal-align">
                         <TextField
-                            className="text-input"
+                            className="form-input"
                             id="firstname"
-                            value={firstname}
+                            label="Firstname"
+                            value={props.cashier.firstname}
                             margin="normal"
-                            label="firstname"
-                            placeholder="firstname"
-                            onChange={event => setFirstName(event.target.value)}
+                            className="text-input"
+                            onChange={event => props.updateCashier(event)}
                             type="text"
                             variant="filled"
                         />
                         <TextField
-                            className="text-input"
+                            className="form-input"
                             id="lastname"
-                            value={lastname}
+                            value={props.cashier.lastname}
                             margin="normal"
-                            label="lastname"
-                            placeholder="lastname"
-                            onChange={event => setLastname(event.target.value)}
+                            label="Lastname"
+                            className="text-input"
+                            onChange={event => props.updateCashier(event)}
                             type="text"
                             variant="filled"
                         />
                     </div>
                     <div className="horizontal-align">
                         <TextField
-                            className="text-input"
+                            className="form-input"
                             id="phoneNumber"
-                            value={phoneNumber}
-                            margin="normal"
                             label="PhoneNumber"
-                            placeholder="PhoneNumber"
-                            onChange={event => setPhoneNumber(event.target.value)}
+                            value={props.cashier.phoneNumber}
+                            margin="normal"
+                            helperText="Mobile phone number"
+                            className="text-input"
+                            onChange={event => props.updateCashier(event)}
                             type="text"
                             variant="filled"
                         />
 
                         <TextField
-                            className="text-input"
+                            className="form-input"
                             id="password"
-                            value={password}
+                            value={props.cashier.password}
                             margin="normal"
                             label="Password"
-                            placeholder="Password"
-                            onChange={event => setPassword(event.target.value)}
+                            className="text-input"
+                            helperText="You can set a new password here!"
+                            onChange={event => props.updateCashier(event)}
                             type="password"
                             variant="filled"
                         />
                     </div>
                     <div className="align-select">
-                        <FormControl variant="filled" className="form-select">
+                        <FormControl id="gender" variant="filled" className="form-select">
                             <InputLabel htmlFor="filled-gender-simple">Gender</InputLabel>
                             <Select
-                                value={gender}
-                                onChange={event => setGender(event.target.value)}
+                                id="gender"
+                                value={props.cashier.gender}
+                                onChange={event => {
+                                    event.target.id = "gender";
+                                    props.updateCashier(event);
+                                }}
                                 inputProps={{
                                     name: "gender",
-                                    id: "filled-gender-simple"
+                                    id: "gender"
                                 }}
                             >
                                 <MenuItem value="male">male</MenuItem>
                                 <MenuItem value="female">female</MenuItem>
                             </Select>
                         </FormControl>
+
+                        <TextField
+                            className="form-input"
+                            id="iam"
+                            value={props.cashier.iam}
+                            margin="normal"
+                            label="IAM"
+                            className="text-input"
+                            onChange={event => props.updateCashier(event)}
+                            type="text"
+                            variant="filled"
+                        />
+                    </div>
+                    <div className="horizontal-align">
+                        <Paper style={{ width: "100%", backgroundColor: "lightGrey", margin: "10px" }}>
+                            <Table aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell align="center">Total Customers Requests</TableCell>
+                                        <TableCell align="center">Total Gems Gained💎</TableCell>
+                                        <TableCell align="center">Total Gems Redeemed💎</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell align="center" component="th" scope="row">
+                                            {props.cashier.customersAttendedTo}
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            {props.cashier.totalGemsGainedForCustomers}
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            {props.cashier.totalGemsRedeemedForCustomers}
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </Paper>
                     </div>
                     <Snackbar
                         anchorOrigin={{
@@ -204,20 +244,14 @@ export default function CashierRegistrationModal(props) {
                     <Button
                         disabled={props.saving}
                         onClick={() => {
-                            setFirstName("");
-                            setLastname("");
-                            setPhoneNumber("");
-                            setPassword("");
-                            setGender("");
                             props.Close();
                         }}
-                        color="primary"
                     >
                         Close
                     </Button>
                     <Button
                         disabled={props.saving}
-                        onClick={() => props.Save({ firstname, lastname, password, phoneNumber, gender })}
+                        onClick={() => props.Update()}
                         color="primary"
                         autoFocus
                         variant="contained"
@@ -233,7 +267,7 @@ export default function CashierRegistrationModal(props) {
                                 <CircularProgress size={24} />
                             </Fade>
                         ) : (
-                            "Save"
+                            "Update"
                         )}
                     </Button>
                 </DialogActions>

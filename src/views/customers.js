@@ -2,10 +2,10 @@ import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import MaterialTable from "material-table";
-import LoyaltyIcon from "@material-ui/icons/Loyalty";
-import { Button, Chip } from "@material-ui/core";
+import { Chip, Avatar } from "@material-ui/core";
 import { createAxiosInstance, getUserData } from "../util";
 import CustomerModal from "../components/customer.modal";
+import { red } from "@material-ui/core/colors";
 
 function changeColor(membershipType) {
     if (membershipType === "regular") return "#26de81";
@@ -14,12 +14,50 @@ function changeColor(membershipType) {
     else if (membershipType === "platinum") return "#C5C5C5";
 }
 
+const nameStyle = {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center"
+};
+
+const nameAvatar = {
+    backgroundColor: red[500],
+    marginRight: "10px",
+    marginLeft: "10px"
+};
+
 const columns = [
-    { field: "id", title: "Id", minWidth: 170 },
+    {
+        field: "name",
+        title: "Name",
+        minWidth: 350,
+        render: rowData => (
+            <div style={nameStyle}>
+                <Avatar style={nameAvatar}>{`${rowData.name
+                    .split(" ")[0]
+                    .substr(0, 1)
+                    .toUpperCase()} 
+                ${rowData.name
+                    .split(" ")[1]
+                    .substr(0, 1)
+                    .toUpperCase()}`}</Avatar>
+                <p style={{ fontWeight: "bold" }}>{rowData.name}</p>
+            </div>
+        ),
+        cellStyle: {
+            padding: "0px"
+        }
+    },
+    { field: "phoneNumber", title: "Phone Number", minWidth: 170 },
+    { field: "email", title: "Email", minWidth: 170 },
     {
         field: "membershipType",
         title: "MembershipType",
         minWidth: 170,
+        cellStyle: {
+            display: "flex",
+            justifyContent: "center"
+        },
         render: rowData => (
             <Chip
                 label={rowData.membershipType}
@@ -44,13 +82,6 @@ const columns = [
     }
 ];
 
-const loyaltyTagStyle = {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center"
-};
-
 function createData(obj) {
     return {
         id: obj.id,
@@ -59,7 +90,8 @@ function createData(obj) {
         phoneNumber: obj.phoneNumber,
         gender: obj.gender,
         loyaltyPoints: obj.loyaltyPoints.currentPoints,
-        membershipType: obj.membershipType
+        membershipType: obj.membershipType,
+        transactions: obj.transactions
     };
 }
 
@@ -93,7 +125,8 @@ export default function Customer() {
         email: "",
         phoneNumber: "",
         gender: "",
-        loyaltyPoints: ""
+        loyaltyPoints: "",
+        transactions: []
     });
 
     useEffect(() => {
@@ -165,7 +198,8 @@ export default function Customer() {
                     actions={tableActions}
                     options={{
                         columnsButton: true,
-                        actionsColumnIndex: -1
+                        actionsColumnIndex: -1,
+                        size: "small"
                     }}
                 />
                 <CustomerModal

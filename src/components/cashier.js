@@ -69,7 +69,7 @@ function SnackbarWrapper(props) {
     const classes = useStyles1();
     const { className, message, onClose, variant, ...other } = props;
     const Icon = variantIcon[variant];
-
+    console.log("edit", props.edit);
     return (
         <SnackbarContent
             className={clsx(classes[variant], className)}
@@ -115,6 +115,9 @@ export default function CashierModal(props) {
                             onChange={event => props.updateCashier(event)}
                             type="text"
                             variant="filled"
+                            inputProps={{
+                                readOnly: Boolean(!props.edit)
+                            }}
                         />
                         <TextField
                             className="form-input"
@@ -126,6 +129,9 @@ export default function CashierModal(props) {
                             onChange={event => props.updateCashier(event)}
                             type="text"
                             variant="filled"
+                            inputProps={{
+                                readOnly: Boolean(!props.edit)
+                            }}
                         />
                     </div>
                     <div className="horizontal-align">
@@ -140,6 +146,9 @@ export default function CashierModal(props) {
                             onChange={event => props.updateCashier(event)}
                             type="text"
                             variant="filled"
+                            inputProps={{
+                                readOnly: Boolean(!props.edit)
+                            }}
                         />
 
                         <TextField
@@ -153,6 +162,9 @@ export default function CashierModal(props) {
                             onChange={event => props.updateCashier(event)}
                             type="password"
                             variant="filled"
+                            inputProps={{
+                                readOnly: Boolean(!props.edit)
+                            }}
                         />
                     </div>
                     <div className="align-select">
@@ -167,7 +179,8 @@ export default function CashierModal(props) {
                                 }}
                                 inputProps={{
                                     name: "gender",
-                                    id: "gender"
+                                    id: "gender",
+                                    readOnly: Boolean(!props.edit)
                                 }}
                             >
                                 <MenuItem value="male">male</MenuItem>
@@ -185,6 +198,9 @@ export default function CashierModal(props) {
                             onChange={event => props.updateCashier(event)}
                             type="text"
                             variant="filled"
+                            inputProps={{
+                                readOnly: Boolean(!props.edit)
+                            }}
                         />
                     </div>
                     <div className="horizontal-align">
@@ -249,27 +265,29 @@ export default function CashierModal(props) {
                     >
                         Close
                     </Button>
-                    <Button
-                        disabled={props.saving}
-                        onClick={() => props.Update()}
-                        color="primary"
-                        autoFocus
-                        variant="contained"
-                    >
-                        {props.saving ? (
-                            <Fade
-                                in={props.saving}
-                                style={{
-                                    transitionDelay: props.saving ? "100ms" : "0ms"
-                                }}
-                                unmountOnExit
-                            >
-                                <CircularProgress size={24} />
-                            </Fade>
-                        ) : (
-                            "Update"
-                        )}
-                    </Button>
+                    {props.edit ? (
+                        <Button
+                            disabled={props.saving}
+                            onClick={() => props.Update()}
+                            color="primary"
+                            autoFocus
+                            variant="contained"
+                        >
+                            {props.saving ? (
+                                <Fade
+                                    in={props.saving}
+                                    style={{
+                                        transitionDelay: props.saving ? "100ms" : "0ms"
+                                    }}
+                                    unmountOnExit
+                                >
+                                    <CircularProgress size={24} />
+                                </Fade>
+                            ) : (
+                                "Update"
+                            )}
+                        </Button>
+                    ) : null}
                 </DialogActions>
             </Dialog>
         </div>
