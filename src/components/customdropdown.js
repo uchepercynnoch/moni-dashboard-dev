@@ -13,7 +13,7 @@ import MenuList from "@material-ui/core/MenuList";
 export default function SplitButton(props) {
     const [open, setOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
-    const [selectedIndex, setSelectedIndex] = React.useState(1);
+    const [selectedIndex, setSelectedIndex] = React.useState(0);
 
     const handleMenuItemClick = (event, index) => {
         setSelectedIndex(index);
@@ -37,7 +37,7 @@ export default function SplitButton(props) {
         <Grid style={{ ...props.style }} container direction="column" alignItems="center">
             <Grid item xs={12}>
                 <ButtonGroup variant="contained" color="primary" ref={anchorRef} aria-label="split button">
-                    <Button onClick={handleToggle}>{props.options[selectedIndex].name}</Button>
+                    <Button onClick={handleToggle}>{props.options[selectedIndex].vendorName}</Button>
                     <Button
                         color="primary"
                         size="small"
@@ -62,11 +62,10 @@ export default function SplitButton(props) {
                                         {props.options.map((option, index) => (
                                             <MenuItem
                                                 key={index}
-                                                disabled={index === 2}
                                                 selected={index === selectedIndex}
                                                 onClick={event => handleMenuItemClick(event, index)}
                                             >
-                                                {option.name}
+                                                {option.vendorName}
                                             </MenuItem>
                                         ))}
                                     </MenuList>

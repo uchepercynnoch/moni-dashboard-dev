@@ -8,8 +8,13 @@ import { ThemeProvider } from "@material-ui/styles";
 import { createMuiTheme, responsiveFontSizes } from "@material-ui/core/styles";
 import "react-dates/initialize";
 import "react-dates/lib/css/_datepicker.css";
+import Dinero from "dinero.js";
 
 function App() {
+    //Initializations
+    //Dinero.globalLocale = "en-NG";
+    Dinero.globalFormat = "$0,0.00";
+    
     let theme = createMuiTheme({
         palette: {
             primary: {

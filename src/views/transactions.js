@@ -3,19 +3,20 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import MaterialTable from "material-table";
 import { Button, Chip } from "@material-ui/core";
-import { createAxiosInstance, getUserData } from "../util";
+import { createAxiosInstance, getUserData, isSuperAdmin } from "../util";
 import TransactionModal from "../components/transaction";
 import { DateRangePicker } from "react-dates";
 import Moment from "moment";
 import _ from "lodash";
+import { toDinero } from "../dinero-helper";
 
 const columns = [
-    { field: "transactionId", title: "Transaction Ref", minWidth: 170 },
+    { field: "transactionId", title: "Transaction Id", minWidth: 170 },
     {
-        field: "dateOfTransaction",
-        title: "Date of Transaction",
+        field: "date",
+        title: "Date",
         minWidth: 100,
-        render: rowData => Moment(rowData.dateOfTransaction).format("YYYY-MM-DD")
+        render: rowData => Moment(rowData.date).format("YYYY-MM-DD")
     },
     {
         field: "servicedBy",
@@ -23,30 +24,34 @@ const columns = [
         minWidth: 170
     },
     {
-        field: "type",
-        title: "Type",
-        render: rowData => (
-            <Chip
-                label={rowData.type}
-                size="small"
-                style={{
-                    color: "white",
-                    backgroundColor: rowData.type === "gain" ? "#2ecc71" : "#e74c3c",
-                    marginTop: "20px"
-                }}
-            />
-        )
-    },
-    {
-        field: "citizen",
-        title: "Citizen",
+        field: "membershipType",
+        title: "Membership Type",
         minWidth: 170
     },
     {
-        field: "points",
-        title: "Gems💎",
-        minWidth: 170,
-        render: rowData => <div style={loyaltyTagStyle}>{rowData.points}</div>
+        field: "gemsAwarded",
+        title: "Gems Awarded",
+        minWidth: 170
+    },
+    {
+        field: "gemsDeducted",
+        title: "Gems Deducted",
+        minWidth: 170
+    },
+    // {
+    //     field: "payable",
+    //     title: "Payable",
+    //     minWidth: 170
+    // },
+    // {
+    //     field: "total",
+    //     title: "Total",
+    //     minWidth: 170
+    // },
+    {
+        field: "user",
+        title: "Customer",
+        minWidth: 170
     }
 ];
 
@@ -61,12 +66,16 @@ function createData(obj) {
     console.log(obj.servicedBy.iam);
     return {
         transactionId: obj.transactionId,
-        dateOfTransaction: obj.dateOfTransaction,
+        date: obj.date,
         servicedBy: obj.servicedBy.iam, // merchant
-        type: obj.type,
-        points: obj.type === "gain" ? obj.gainedPoints : obj.deductedPoints,
-        citizen: obj.citizen.name,
-        items: obj.items
+        membershipType: obj.user.membershipType,
+        gemsAwarded: obj.gemsAwarded,
+        gemsDeducted: obj.gemsDeducted,
+        user: obj.user.name,
+        items: obj.items,
+        payable: toDinero(obj.payable).toFormat(),
+        total: toDinero(obj.total).toFormat(),
+        vendor: obj.vendor.vendorName
     };
 }
 
@@ -99,19 +108,26 @@ export default function Transaction() {
     const [focused, setFocused] = React.useState(null);
     const [transaction, setTransaction] = React.useState({
         transactionId: "",
-        dateOfTransaction: "",
+        date: "",
         servicedBy: "",
-        type: "",
-        points: "",
-        citizen: "",
-        items: []
+        user: "",
+        items: [],
+        membershipType: "",
+        gemsAwarded: "",
+        gemsDeducted: "",
+        payable: null,
+        total: null,
+        vendor: null
     });
 
     useEffect(() => {
+        const url = isSuperAdmin() ? `/api/transaction` : `/api/transaction?vendorId=${getUserData().vendor}`;
         createAxiosInstance()
-            .get(`/transaction/all?id=${getUserData().vendor}`)
+            .get(url)
             .then(res => {
                 const transactions = [];
+                if (res.data.length <= 0)
+                    return;
                 res.data.forEach(data => {
                     transactions.push(createData(data));
                 });
@@ -135,7 +151,7 @@ export default function Transaction() {
 
     const getTransaction = id => {
         createAxiosInstance()
-            .get(`/transaction?id=${id}`)
+            .get(`/api/transaction?id=${id}`)
             .then(res => {
                 const obj = createData(res.data);
                 console.log(obj);
@@ -187,9 +203,7 @@ export default function Transaction() {
             const date = Moment(data.dateOfTransaction);
             const start = Moment(startDate).format("YYYY-MM-DD");
             const end = Moment(endDate).format("YYYY-MM-DD");
-            
-            console.log(`${Moment(data.dateOfTransaction).format("YYYY-MM-DD")} ${Moment(startDate).format("YYYY-MM-DD")} ${Moment(endDate).format("YYY-MM-DD")}`);
-            
+                        
             return date.isBetween(start, end) || date.isSame(start) || date.isSame(end);
         });
         setRows(result);

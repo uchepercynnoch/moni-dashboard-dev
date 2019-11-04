@@ -3,13 +3,14 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import MaterialTable from "material-table";
 import { Button } from "@material-ui/core";
-import { createAxiosInstance, getUserData } from "../util";
+import { createAxiosInstance, getUserData, isSuperAdmin } from "../util";
 import NewsRegister from "../components/news.register";
 import NewsModal from "../components/news.modal";
+import Moment from "moment";
 
 const columns = [
     { field: "title", title: "Title", minWidth: 170 },
-    { field: "dateCreated", title: "Date Created %", minWidth: 150 }
+    { field: "dateCreated", title: "Date Created", minWidth: 150, render: rowData => Moment(rowData.dateCreated).format("YYYY-MM-DD") }
 ];
 
 function createData(obj) {
@@ -58,8 +59,10 @@ export default function News() {
     });
 
     useEffect(() => {
+        const url = isSuperAdmin() ? `/api/news` : `/api/news?vendorId=${getUserData().vendor}`;
+
         createAxiosInstance()
-            .get(`/news/?id=${getUserData().vendor}`)
+            .get(url)
             .then(res => {
                 const news = [];
                 res.data.forEach(data => {
@@ -85,7 +88,7 @@ export default function News() {
         formdata.append("vendorId", getUserData().vendor);
 
         createAxiosInstance()
-            .post("/news", formdata)
+            .post("/api/news", formdata)
             .then(res => {
                 setSaving(false);
                 setSaved(true);
@@ -104,7 +107,7 @@ export default function News() {
 
     const getNews = id => {
         createAxiosInstance()
-            .get(`/news/single?id=${id}`)
+            .get(`/api/news?id=${id}`)
             .then(res => {
                 console.log(res.data);
                 setNews(createData(res.data));
@@ -130,7 +133,8 @@ export default function News() {
 
     const newsUpdate = () => {
         const formdata = new FormData();
-        formdata.append("newsImage", news.newsImage, news.newsImage.name);
+        if(news.newsImage)
+            formdata.append("newsImage", news.newsImage, news.newsImage.name);
         formdata.append("content", news.content);
         formdata.append("title", news.title);
 
@@ -138,7 +142,7 @@ export default function News() {
         setSaved(false);
         setError(false);
         createAxiosInstance()
-            .post(`/news/update?id=${news.id}`, formdata)
+            .post(`/api/news/update?id=${news.id}`, formdata)
             .then(res => {
                 setSaving(false);
                 setSaved(true);

@@ -9,17 +9,15 @@ import IconButton from "@material-ui/core/IconButton";
 import Badge from "@material-ui/core/Badge";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import NotificationsIcon from "@material-ui/icons/Notifications";
 import { useStyles } from "../styles/dashboard.style";
 import Copyright from "../components/copyright";
 import DashboardIcon from "@material-ui/icons/Dashboard";
-import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import PeopleIcon from "@material-ui/icons/People";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import BarChartIcon from "@material-ui/icons/BarChart";
 import LayersIcon from "@material-ui/icons/Layers";
+import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
 import {
     LocalOffer,
     AccountBalance,
@@ -28,7 +26,6 @@ import {
     VerifiedUser
 } from "@material-ui/icons";
 import BusinessIcon from "@material-ui/icons/Business";
-import Products from "./products";
 import Overview from "./overview";
 import Customers from "./customers";
 import Cashiers from "./cashiers";
@@ -37,6 +34,8 @@ import { invalidateToken, getUserData } from "../util";
 import Transaction from "./transactions";
 import Offers from "./offers";
 import News from "./news";
+import Vendors from "./vendors";
+import Admins from "./admins";
 
 export default function Dashboard(props) {
     const classes = useStyles();
@@ -70,8 +69,10 @@ export default function Dashboard(props) {
                 return <Offers />;
             case 7:
                 return <News />;
-            // case 8:
-            //     return <p>Configurations</p>;
+            case 8:
+                 return <Vendors/>;
+            case 9:
+                return <Admins/>;
             default:
                 return <Overview />;
         }
@@ -134,6 +135,8 @@ export default function Dashboard(props) {
                     </ListItemIcon>
                     <ListItemText primary="Customers" />
                 </ListItem>
+                {getUserData().role === "admin" ? (
+
                 <ListItem
                     style={value === 4 ? { backgroundColor: "#505569" } : {}}
                     button
@@ -143,7 +146,7 @@ export default function Dashboard(props) {
                         <PersonPinCircle />
                     </ListItemIcon>
                     <ListItemText primary="Cashiers" />
-                </ListItem>
+                </ListItem>) : null}
                 <ListItem
                     style={value === 5 ? { backgroundColor: "#505569" } : {}}
                     button
@@ -188,6 +191,16 @@ export default function Dashboard(props) {
                         </ListItem>
                     </div>
                 ) : null}
+                        <ListItem
+                            style={value === 9 ? { backgroundColor: "#505569" } : {}}
+                            button
+                            onClick={() => changeContent(9)}
+                        >
+                            <ListItemIcon className={classes.listStyle}>
+                                <VerifiedUserIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Admin" />
+                        </ListItem>
             </div>
         );
     };

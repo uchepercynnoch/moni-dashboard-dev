@@ -31,6 +31,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
+import {isSuperAdmin} from "../util";
 
 const variantIcon = {
     success: CheckCircleIcon,
@@ -106,7 +107,6 @@ export default function CashierModal(props) {
                 <DialogContent>
                     <div className="horizontal-align">
                         <TextField
-                            className="form-input"
                             id="firstname"
                             label="Firstname"
                             value={props.cashier.firstname}
@@ -120,7 +120,6 @@ export default function CashierModal(props) {
                             }}
                         />
                         <TextField
-                            className="form-input"
                             id="lastname"
                             value={props.cashier.lastname}
                             margin="normal"
@@ -136,7 +135,6 @@ export default function CashierModal(props) {
                     </div>
                     <div className="horizontal-align">
                         <TextField
-                            className="form-input"
                             id="phoneNumber"
                             label="PhoneNumber"
                             value={props.cashier.phoneNumber}
@@ -203,7 +201,7 @@ export default function CashierModal(props) {
                             }}
                         />
                     </div>
-                    <div className="horizontal-align">
+                    {/* <div className="horizontal-align">
                         <Paper style={{ width: "100%", backgroundColor: "lightGrey", margin: "10px" }}>
                             <Table aria-label="simple table">
                                 <TableHead>
@@ -228,7 +226,7 @@ export default function CashierModal(props) {
                                 </TableBody>
                             </Table>
                         </Paper>
-                    </div>
+                    </div> */}
                     <Snackbar
                         anchorOrigin={{
                             vertical: "bottom",
@@ -273,19 +271,21 @@ export default function CashierModal(props) {
                             autoFocus
                             variant="contained"
                         >
-                            {props.saving ? (
-                                <Fade
-                                    in={props.saving}
-                                    style={{
-                                        transitionDelay: props.saving ? "100ms" : "0ms"
-                                    }}
-                                    unmountOnExit
-                                >
-                                    <CircularProgress size={24} />
-                                </Fade>
-                            ) : (
-                                "Update"
-                            )}
+                            {
+                                isSuperAdmin() ? null : <>{props.saving ? (
+                                    <Fade
+                                        in={props.saving}
+                                        style={{
+                                            transitionDelay: props.saving ? "100ms" : "0ms"
+                                        }}
+                                        unmountOnExit
+                                    >
+                                        <CircularProgress size={24} />
+                                    </Fade>
+                                ) : (
+                                    "Update"
+                                )}</>
+                            }
                         </Button>
                     ) : null}
                 </DialogActions>

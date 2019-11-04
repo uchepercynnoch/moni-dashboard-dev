@@ -1,102 +1,236 @@
 import React, { PureComponent } from "react";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Sector } from "recharts";
 import { createAxiosInstance, getUserData } from "../util";
-import { Typography, Paper } from "@material-ui/core";
-
-const data = [{ name: "Group A", value: 400 }, { name: "Group B", value: 300 }];
+import {
+  Typography,
+  Paper,
+  Chip,
+  Button,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell
+} from "@material-ui/core";
+import StatCard from "../components/statcard";
+import MembershipTag from "./membershipTag";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend
+} from "recharts";
+import SplitButton from "./customdropdown";
+import { toDinero } from "../dinero-helper";
+import Doc from "../export-helper";
+import ExportModal from "../components/export";
 
 export default class PointsChart extends PureComponent {
-    constructor(props) {
-        super(props);
-        this.state = {
-            activeIndex: 0,
-            data: [],
-            totalSales: 0
-        };
-    }
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeIndex: 0,
+      data: [],
+      untransformedData: [],
+      selectedVendor: null,
+      open: false
+    };
+  }
 
-    componentWillMount() {
-        createAxiosInstance()
-            .get(`/analytics/stats?id=${getUserData().vendor}`)
-            .then(res => {
-                const obj = { ...this.state };
-                const obj1 = { name: "Points-Earned", value: res.data.totalPointsEarned };
-                const obj2 = { name: "Points-Redeemed", value: res.data.totalPointsRedeemed };
-                obj.data.push(obj1, obj2);
-                obj.totalSales = res.data.totalSales;
-                console.log(obj);
+  onPieEnter = (data, index) => {
+    this.setState({
+      activeIndex: index
+    });
+  };
 
-                this.setState(obj);
-            })
-            .catch(error => {
-                console.log(error);
-                alert(error);
-            });
-    }
+  getVendor() {
+    return createAxiosInstance()
+      .get(`/api/vendor?id=${getUserData().vendor}`)
+      .then(res => res.data);
+  }
 
-    onPieEnter = (data, index) => {
+  componentWillMount() {
+    this.getVendor()
+      .then(result => {
+        console.log(result);
+        const vendor = this.transformData(result);
+        const arr = [...this.state.data];
+        arr.push(vendor);
         this.setState({
-            activeIndex: index
+          ...this.state,
+          untransformedData: result,
+          data: arr,
+          selectedVendor: result
         });
+      })
+      .catch(error => console.log(error));
+  }
+
+  transformData(item) {
+    console.log(item);
+    const obj = {
+      vendorName: item.vendorName,
+      reservior: item.payable.amount,
+      revenue: item.revenue.amount,
+      total: item.total.amount
+    };
+    return obj;
+  }
+
+  renderTable(ref) {
+    return (
+      <div ref={ref}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Vendor</TableCell>
+              <TableCell>Expected Revenue</TableCell>
+              <TableCell>Actual Revenue</TableCell>
+              <TableCell>Reservior</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+              <TableRow>
+                <TableCell>{this.state.untransformedData.vendorName}</TableCell>
+                <TableCell>
+                  {toDinero(this.state.untransformedData.total).toFormat("$0,0.00")}
+                </TableCell>
+                <TableCell>
+                  {toDinero(this.state.untransformedData.revenue).toFormat("$0,0.00")}
+                </TableCell>
+                <TableCell>
+                  {toDinero(this.state.untransformedData.payable).toFormat("$0,0.00")}
+                </TableCell>
+              </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+    );
+  }
+  renderExportFormat() {
+    this.setState({ ...this.state, open: true });
+    // console.log(this.state.ref);
+    // Doc.createPdf(this.state.ref.current);
+  }
+
+  render() {
+    const containerStyle = {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "flex-start",
+      flexWrap: "wrap"
     };
 
-    render() {
-        const cardStyle = {
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "70px",
-            width: "200px",
-            margin: "10px"
-        };
-        const containerStyle = {
-            display: "flex",
-            flexDirection: "row"
-        };
-        return (
-            <div style={containerStyle}>
-                {this.state.data.length > 0 ? (
-                    <AreaChart
-                        width={500}
-                        height={300}
-                        data={this.state.data}
-                        margin={{
-                            top: 10,
-                            right: 30,
-                            left: 0,
-                            bottom: 0
-                        }}
-                    >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Area type="monotone" dataKey="value" stroke="#8884d8" fill="#8884d8" />
-                    </AreaChart>
-                ) : (
-                    "loading..."
-                )}
+    const statCardContainer = {
+      display: "flex",
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      height: "100%",
+      width: "100%",
+      backgroundColor: "#ecf0f1"
+    };
+    const statsStyle = {
+      display: "flex",
+      flexDirection: "column",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      height: "100%",
+      width: "50%",
+      padding: "10px"
+    };
 
-                {this.state.data.length > 0 ? (
-                    <div>
-                        <Paper style={{ ...cardStyle, backgroundColor: "#1abc9c" }}>
-                            <p style={{ margin: "0px" }}>Total Sales</p>
-                            <h1 style={{ margin: "0px" }}>{this.state.totalSales}</h1>
-                        </Paper>
-                        <Paper style={{ ...cardStyle, backgroundColor: "#27ae60" }}>
-                            <p style={{ margin: "0px" }}>Total Points Earned</p>
-                            <h1 style={{ margin: "0px" }}>{this.state.data[0].value}</h1>
-                        </Paper>
-                        <Paper style={{ ...cardStyle, backgroundColor: "#c0392b" }}>
-                            <p style={{ margin: "0px" }}>Total Points Redeemed</p>
-                            <h1 style={{ margin: "0px" }}>{this.state.data[1].value}</h1>
-                        </Paper>
-                    </div>
-                ) : (
-                    "loading..."
-                )}
-            </div>
-        );
-    }
+    const chipStyle = {
+      color: "white",
+      backgroundColor: "#070E2E",
+      borderRadius: "0px"
+    };
+
+    const chartWrapperStyle = {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center"
+    };
+
+    return (
+      <div>
+        <Button
+          style={{ margin: "5px" }}
+          size="small"
+          color="primary"
+          variant="contained"
+          aria-label="export"
+          onClick={() => this.renderExportFormat()}
+        >
+          Export
+        </Button>
+        <div style={containerStyle}>
+          {this.state.data.length > 0 ? (
+            <>
+              <div style={chartWrapperStyle}>
+                <BarChart
+                  width={500}
+                  height={300}
+                  data={this.state.data}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="vendorName" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar
+                    dataKey="reservior"
+                    fill="#8884d8"
+                    background={{ fill: "#eee" }}
+                  />
+                  <Bar dataKey="revenue" fill="#82ca9d" />
+                </BarChart>
+              </div>
+
+              <div style={statsStyle}>
+                <Chip
+                label={this.state.selectedVendor.vendorName}
+                  style={chipStyle}
+                  options={this.state.data}
+                />
+                <div style={statCardContainer}>
+                  <StatCard
+                    tag="Total Cash"
+                    value={toDinero(this.state.selectedVendor.total).toFormat()}
+                  />
+                  <StatCard
+                    tag="Revenue"
+                    value={toDinero(
+                      this.state.selectedVendor.revenue
+                    ).toFormat()}
+                  />
+                  <StatCard
+                    tag="Reservior"
+                    value={toDinero(
+                      this.state.selectedVendor.reservior
+                    ).toFormat()}
+                  />
+                </div>
+              </div>
+            </>
+          ) : null}
+        </div>
+
+        <ExportModal
+          Close={() => this.setState({ ...this.state, open: false })}
+          open={this.state.open}
+          table={ref => this.renderTable(ref)}
+        />
+      </div>
+    );
+  }
 }

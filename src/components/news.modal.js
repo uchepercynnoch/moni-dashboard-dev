@@ -28,7 +28,6 @@ import IconButton from "@material-ui/core/IconButton";
 import SnackbarContent from "@material-ui/core/SnackbarContent";
 import WarningIcon from "@material-ui/icons/Warning";
 import { makeStyles } from "@material-ui/core/styles";
-import { baseURL } from "../util";
 
 const variantIcon = {
     success: CheckCircleIcon,
@@ -115,10 +114,10 @@ export default function OfferModal(props) {
                     />
                     <TextField
                         className="form-input"
-                        id="percentage"
+                        id="content"
                         value={props.news.content}
                         margin="normal"
-                        label="Percentage"
+                        label="Content"
                         className="text-input"
                         onChange={event => props.updateNews(event)}
                         type="text"
@@ -129,9 +128,6 @@ export default function OfferModal(props) {
                     />
 
                     <div style={{ margin: "10px" }}>
-                        <img alt="No Image!" src={`${baseURL}${props.news.imageId}`} width="50" height="50" />
-                    </div>
-                    <div style={{ margin: "10px" }}>
                         <label htmlFor="selectedFile">select an image to represent the news</label>
                         <br />
                         <input
@@ -140,6 +136,9 @@ export default function OfferModal(props) {
                             type="file"
                             onChange={event => props.updateNews(event)}
                         />
+                    </div>
+                    <div style={{ margin: "10px" }}>
+                        <img alt="No Image!" src={props.news.imageId} width="50" height="50" />
                     </div>
 
                     <Snackbar

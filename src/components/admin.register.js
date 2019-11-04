@@ -1,19 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { useTheme } from "@material-ui/core/styles";
 import {
     TextField,
     Button,
-    Snackbar,
-    Paper,
-    Table,
-    TableHead,
-    TableRow,
-    TableCell,
-    TableBody,
-    Typography
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    CircularProgress,
+    Fade,
+    Snackbar
 } from "@material-ui/core";
 import "../styles/cashRegistration.css";
 import clsx from "clsx";
@@ -91,101 +92,104 @@ const useStyles2 = makeStyles(theme => ({
     }
 }));
 
-export default function CustomerModal(props) {
+export default function AdminRegister(props) {
     const classes = useStyles2();
+
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [gender, setGender] = useState("");
+    const [vendor, setVendor] = useState("");
 
     return (
         <div>
             <Dialog open={props.open} onClose={() => props.Close()} aria-labelledby="responsive-dialog-title">
-                <DialogTitle id="responsive-dialog-title">{"Customer"}</DialogTitle>
+                <DialogTitle id="responsive-dialog-title">{"Create a new admin."}</DialogTitle>
                 <DialogContent>
                     <div className="horizontal-align">
                         <TextField
+                            className="text-input"
                             id="name"
-                            label="Name"
-                            value={props.customer.name}
+                            value={name}
                             margin="normal"
+                            label="Name"
+                            onChange={event => setName(event.target.value)}
                             type="text"
                             variant="filled"
-                            className="text-input"
-                            inputProps={{
-                                readOnly: Boolean(true)
-                            }}
                         />
-
                         <TextField
+                            className="text-input"
                             id="email"
-                            value={props.customer.email}
+                            value={email}
                             margin="normal"
                             label="Email"
+                            onChange={event => setEmail(event.target.value)}
                             type="text"
-                            className="text-input"
                             variant="filled"
-                            inputProps={{
-                                readOnly: Boolean(true)
-                            }}
                         />
                     </div>
-
                     <div className="horizontal-align">
                         <TextField
-                            id="gender"
-                            label="Gender"
-                            value={props.customer.gender}
+                            className="text-input"
+                            id="phoneNumber"
+                            value={phoneNumber}
                             margin="normal"
+                            label="Phone Number"
+                            placeholder="PhoneNumber"
+                            onChange={event => setPhoneNumber(event.target.value)}
                             type="text"
                             variant="filled"
-                            className="text-input"
-                            inputProps={{
-                                readOnly: Boolean(true)
-                            }}
                         />
 
                         <TextField
-                            id="loyaltyPoints"
                             className="text-input"
-                            value={props.customer.gemPoints}
-                            margin="none"
-                            label="Gems💎"
-                            type="number"
+                            id="password"
+                            value={password}
+                            margin="normal"
+                            label="Password"
+                            placeholder="Password"
+                            onChange={event => setPassword(event.target.value)}
+                            type="password"
                             variant="filled"
-                            inputProps={{
-                                readOnly: Boolean(true)
-                            }}
                         />
                     </div>
-                    <div>
-                    <Typography component="h5">Transactions</Typography>
-                        <Paper>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Transaction Id</TableCell>
-                                        <TableCell>Items</TableCell>
-                                        <TableCell>Serviced By</TableCell>
-                                        <TableCell>Gems Awarded</TableCell>
-                                        <TableCell>Gems Deducted</TableCell>
-                                        <TableCell>Total</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {props.customer.transactions.map((transaction, key) => (
-                                        <TableRow key={key}>
-                                            <TableCell>{transaction.transactionId}</TableCell>
-                                            <TableCell>{transaction.items.map((item, key) => (
-                                                <p key={key}>{item.name}</p>
-                                            ))}</TableCell>
-                                            <TableCell>{transaction.servicedBy.iam}</TableCell>
-                                            <TableCell>{transaction.gemsAwarded}</TableCell>
-                                            <TableCell>{transaction.gemsDeducted}</TableCell>
-                                            <TableCell>{transaction.total}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </Paper>
-                    </div>
+                    <div className="align-select">
+                        <FormControl variant="filled" className="form-select">
+                            <InputLabel htmlFor="filled-gender-simple">Gender</InputLabel>
+                            <Select
+                                value={gender}
+                                onChange={event => setGender(event.target.value)}
+                                inputProps={{
+                                    name: "gender",
+                                    id: "filled-gender-simple"
+                                }}
+                            >
+                                <MenuItem value="male">male</MenuItem>
+                                <MenuItem value="female">female</MenuItem>
+                            </Select>
+                        </FormControl>
 
+                        <FormControl variant="filled" className="form-select">
+                            <InputLabel htmlFor="filled-vendor-simple">Vendor</InputLabel>
+                            <Select
+                                value={vendor}
+                                onChange={event => {
+                                    console.log(event.target.value);
+                                    setVendor(event.target.value);
+                                }}
+                                inputProps={{
+                                    name: "vendor",
+                                    id: "filled-vendor-simple"
+                                }}
+                            >
+                                {props.vendors.map((vendor, key) => (
+                                    <MenuItem key={key} value={vendor.id}>{vendor.vendorName}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        
+                    </div>
                     <Snackbar
                         anchorOrigin={{
                             vertical: "bottom",
@@ -215,14 +219,39 @@ export default function CustomerModal(props) {
                 </DialogContent>
                 <DialogActions>
                     <Button
-                        variant="contained"
-                        color="primary"
                         disabled={props.saving}
                         onClick={() => {
+                            setName("");
+                            setEmail("");
+                            setPhoneNumber("");
+                            setPassword("");
+                            setGender("");
                             props.Close();
                         }}
+                        color="primary"
                     >
                         Close
+                    </Button>
+                    <Button
+                        disabled={props.saving}
+                        onClick={() => props.Save({ name, email, password, phoneNumber, gender, vendor })}
+                        color="primary"
+                        autoFocus
+                        variant="contained"
+                    >
+                        {props.saving ? (
+                            <Fade
+                                in={props.saving}
+                                style={{
+                                    transitionDelay: props.saving ? "100ms" : "0ms"
+                                }}
+                                unmountOnExit
+                            >
+                                <CircularProgress size={24} />
+                            </Fade>
+                        ) : (
+                                "Save"
+                            )}
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -102,116 +102,66 @@ export default function Vendor(props) {
     return (
         <div>
             <Dialog open={props.open} onClose={() => props.Close()} aria-labelledby="responsive-dialog-title">
-                <DialogTitle id="responsive-dialog-title">{"Cashier Account"}</DialogTitle>
+                <DialogTitle id="responsive-dialog-title">{"Vendor Account"}</DialogTitle>
                 <DialogContent>
+                    <TextField
+                        className="form-input"
+                        id="vendorName"
+                        label="Vendor"
+                        value={props.vendor.vendorName}
+                        margin="normal"
+                        className="text-input"
+                        onChange={event => props.updateVendor(event)}
+                        type="text"
+                        variant="filled"
+                        inputProps={{
+                            readOnly: Boolean(!props.edit)
+                        }}
+                    />
+                    <TextField
+                        className="form-input"
+                        id="location"
+                        value={props.vendor.location}
+                        margin="normal"
+                        label="Location"
+                        className="text-input"
+                        onChange={event => props.updateVendor(event)}
+                        type="text"
+                        variant="filled"
+                        inputProps={{
+                            readOnly: Boolean(!props.edit)
+                        }}
+                    />
                     <div className="horizontal-align">
                         <TextField
                             className="form-input"
-                            id="firstname"
-                            label="Firstname"
-                            value={props.cashier.firstname}
+                            id="iamAlias"
+                            label="Iam-Alias"
+                            value={props.vendor.iamAlias}
                             margin="normal"
                             className="text-input"
-                            onChange={event => props.updateCashier(event)}
+                            onChange={event => props.updateVendor(event)}
                             type="text"
                             variant="filled"
-                        />
-                        <TextField
-                            className="form-input"
-                            id="lastname"
-                            value={props.cashier.lastname}
-                            margin="normal"
-                            label="Lastname"
-                            className="text-input"
-                            onChange={event => props.updateCashier(event)}
-                            type="text"
-                            variant="filled"
-                        />
-                    </div>
-                    <div className="horizontal-align">
-                        <TextField
-                            className="form-input"
-                            id="phoneNumber"
-                            label="PhoneNumber"
-                            value={props.cashier.phoneNumber}
-                            margin="normal"
-                            helperText="Mobile phone number"
-                            className="text-input"
-                            onChange={event => props.updateCashier(event)}
-                            type="text"
-                            variant="filled"
+                            inputProps={{
+                                readOnly: Boolean(!props.edit)
+                            }}
                         />
 
                         <TextField
                             className="form-input"
-                            id="password"
-                            value={props.cashier.password}
+                            id="loyaltyPercentage"
+                            value={props.vendor.loyaltyPercentage}
                             margin="normal"
-                            label="Password"
+                            label="Loyalty Percentage"
                             className="text-input"
-                            helperText="You can set a new password here!"
-                            onChange={event => props.updateCashier(event)}
-                            type="password"
+                            onChange={event => props.updateVendor(event)}
+                            type="number"
                             variant="filled"
+                            inputProps={{
+                                readOnly: Boolean(!props.edit)
+                            }}
                         />
-                    </div>
-                    <div className="align-select">
-                        <FormControl id="gender" variant="filled" className="form-select">
-                            <InputLabel htmlFor="filled-gender-simple">Gender</InputLabel>
-                            <Select
-                                id="gender"
-                                value={props.cashier.gender}
-                                onChange={event => {
-                                    event.target.id = "gender";
-                                    props.updateCashier(event);
-                                }}
-                                inputProps={{
-                                    name: "gender",
-                                    id: "gender"
-                                }}
-                            >
-                                <MenuItem value="male">male</MenuItem>
-                                <MenuItem value="female">female</MenuItem>
-                            </Select>
-                        </FormControl>
-
-                        <TextField
-                            className="form-input"
-                            id="iam"
-                            value={props.cashier.iam}
-                            margin="normal"
-                            label="IAM"
-                            className="text-input"
-                            onChange={event => props.updateCashier(event)}
-                            type="text"
-                            variant="filled"
-                        />
-                    </div>
-                    <div className="horizontal-align">
-                        <Paper style={{ width: "100%", backgroundColor: "lightGrey", margin: "10px" }}>
-                            <Table aria-label="simple table">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell align="center">Total Customers Requests</TableCell>
-                                        <TableCell align="center">Total Gems Gained💎</TableCell>
-                                        <TableCell align="center">Total Gems Redeemed💎</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    <TableRow>
-                                        <TableCell align="center" component="th" scope="row">
-                                            {props.cashier.customersAttendedTo}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {props.cashier.totalGemsGainedForCustomers}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {props.cashier.totalGemsRedeemedForCustomers}
-                                        </TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </Paper>
                     </div>
                     <Snackbar
                         anchorOrigin={{
@@ -249,27 +199,29 @@ export default function Vendor(props) {
                     >
                         Close
                     </Button>
-                    <Button
-                        disabled={props.saving}
-                        onClick={() => props.Update()}
-                        color="primary"
-                        autoFocus
-                        variant="contained"
-                    >
-                        {props.saving ? (
-                            <Fade
-                                in={props.saving}
-                                style={{
-                                    transitionDelay: props.saving ? "100ms" : "0ms"
-                                }}
-                                unmountOnExit
-                            >
-                                <CircularProgress size={24} />
-                            </Fade>
-                        ) : (
-                            "Update"
-                        )}
-                    </Button>
+                    {props.edit ? (
+                        <Button
+                            disabled={props.saving}
+                            onClick={() => props.Update()}
+                            color="primary"
+                            autoFocus
+                            variant="contained"
+                        >
+                            {props.saving ? (
+                                <Fade
+                                    in={props.saving}
+                                    style={{
+                                        transitionDelay: props.saving ? "100ms" : "0ms"
+                                    }}
+                                    unmountOnExit
+                                >
+                                    <CircularProgress size={24} />
+                                </Fade>
+                            ) : (
+                                "Update"
+                            )}
+                        </Button>
+                    ) : null}
                 </DialogActions>
             </Dialog>
         </div>

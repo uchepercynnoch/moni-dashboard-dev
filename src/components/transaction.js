@@ -3,7 +3,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import { TextField, Button, Snackbar } from "@material-ui/core";
+import { TextField, Button, Snackbar, Typography, Chip } from "@material-ui/core";
 import "../styles/cashRegistration.css";
 import clsx from "clsx";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
@@ -21,6 +21,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
+import { isSuperAdmin } from "../util";
 
 const variantIcon = {
     success: CheckCircleIcon,
@@ -89,18 +90,10 @@ const useStyles2 = makeStyles(theme => ({
 export default function TransactionModal(props) {
     const classes = useStyles2();
 
-    const getTotal = items => {
-        let total = 0;
-        items.forEach(item => {
-            total += item.unitPrice;
-        });
-        return total;
-    };
-
     return (
         <div>
             <Dialog open={props.open} onClose={() => props.Close()} aria-labelledby="responsive-dialog-title">
-                <DialogTitle id="responsive-dialog-title">{"Transaction"}</DialogTitle>
+                <DialogTitle id="responsive-dialog-title">{" Transaction "}</DialogTitle>
                 <DialogContent>
                     <div className="horizontal-align">
                         <TextField
@@ -116,12 +109,10 @@ export default function TransactionModal(props) {
                                 readOnly: Boolean(true)
                             }}
                         />
-                    </div>
-                    <div className="horizontal-align">
                         <TextField
                             className="form-input"
                             id="dateOfTransaction"
-                            value={props.transaction.dateOfTransaction}
+                            value={props.transaction.date}
                             margin="normal"
                             label="Date of Transaction"
                             className="text-input"
@@ -133,82 +124,98 @@ export default function TransactionModal(props) {
                         />
                     </div>
 
-                    <TextField
-                        className="form-input"
-                        id="servicedBy"
-                        label="Cashier"
-                        value={props.transaction.servicedBy}
-                        margin="normal"
-                        className="text-input"
-                        type="text"
-                        variant="filled"
-                        inputProps={{
-                            readOnly: Boolean(true)
-                        }}
-                    />
+                    <div className="horizontal-align">
+                        <TextField
+                            className="form-input"
+                            id="servicedBy"
+                            label="Cashier"
+                            value={props.transaction.servicedBy}
+                            margin="normal"
+                            className="text-input"
+                            type="text"
+                            variant="filled"
+                            inputProps={{
+                                readOnly: Boolean(true)
+                            }}
+                        />
 
-                    <TextField
-                        className="form-input"
-                        id="citizen"
-                        value={props.transaction.citizen}
-                        margin="none"
-                        label="Citizen"
-                        className="text-input"
-                        helperText="landmark citizen"
-                        type="text"
-                        variant="filled"
-                        inputProps={{
-                            readOnly: Boolean(true)
-                        }}
-                    />
-                    <TextField
-                        className="form-input"
-                        style={{ width: "50%" }}
-                        id="points"
-                        value={props.transaction.points}
-                        margin="none"
-                        label="Points"
-                        className="text-input"
-                        type="number"
-                        variant="filled"
-                        inputProps={{
-                            readOnly: Boolean(true)
-                        }}
-                    />
-                    <div>
-                        <Paper style={{ width: "50%", backgroundColor: "lightGrey" }}>
-                            <Table aria-label="simple table">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Product</TableCell>
-                                        <TableCell align="right">Amount</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {props.transaction.items.map(row => (
-                                        <TableRow key={row.name}>
-                                            <TableCell component="th" scope="row">
-                                                {row.name}
-                                            </TableCell>
-                                            <TableCell align="right">₦{row.unitPrice}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                    <TableRow>
-                                        <TableCell rowSpan={2} />
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell colSpan={1}>
-                                            <b>Total</b>
-                                        </TableCell>
-                                        <TableCell colSpan={2}>
-                                            <span>₦</span>
-                                            {getTotal(props.transaction.items)}
-                                        </TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </Paper>
+                        <TextField
+                            className="form-input"
+                            id="user"
+                            value={props.transaction.user}
+                            margin="none"
+                            label="Citizen"
+                            className="text-input"
+                            helperText="landmark citizen"
+                            type="text"
+                            variant="filled"
+                            inputProps={{
+                                readOnly: Boolean(true)
+                            }}
+                        />
                     </div>
+
+                    <div className="horizontal-align">
+                        <TextField
+                            className="form-input"
+                            style={{ width: "50%" }}
+                            id="gemsAwarded"
+                            value={props.transaction.gemsAwarded}
+                            margin="none"
+                            label="Gems Awarded"
+                            className="text-input"
+                            type="number"
+                            variant="filled"
+                            inputProps={{
+                                readOnly: Boolean(true)
+                            }}
+                        />
+                        <TextField
+                            className="form-input"
+                            style={{ width: "50%" }}
+                            id="gemsDeducted"
+                            value={props.transaction.gemsDeducted}
+                            margin="none"
+                            label="Gems Deducted"
+                            className="text-input"
+                            type="number"
+                            variant="filled"
+                            inputProps={{
+                                readOnly: Boolean(true)
+                            }}
+                        />
+                        <TextField
+                            className="form-input"
+                            style={{ width: "50%" }}
+                            id="total"
+                            value={props.transaction.total}
+                            margin="none"
+                            label="Total"
+                            className="text-input"
+                            type="number"
+                            variant="filled"
+                            inputProps={{
+                                readOnly: Boolean(true)
+                            }}
+                        />
+                    </div>
+                    {isSuperAdmin() ? (
+                        <TextField
+                            className="form-input"
+                            style={{ width: "50%" }}
+                            id="vendor"
+                            value={props.transaction.vendor}
+                            margin="none"
+                            label="Vendor"
+                            className="text-input"
+                            type="text"
+                            variant="filled"
+                            inputProps={{
+                                readOnly: Boolean(true)
+                            }}
+                        />
+                    ) : null}
+
                     <Snackbar
                         anchorOrigin={{
                             vertical: "bottom",

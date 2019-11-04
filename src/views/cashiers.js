@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import MaterialTable from "material-table";
 import { Button, Avatar } from "@material-ui/core";
-import { createAxiosInstance, getUserData } from "../util";
+import { createAxiosInstance, getUserData, isSuperAdmin } from "../util";
 import CashierRegistrationModal from "../components/cashierRegisteraton";
 import CashierModal from "../components/cashier";
 import { red } from "@material-ui/core/colors";
@@ -73,9 +73,9 @@ function createSingleData(obj) {
         password: "",
         gender: obj.gender,
         phoneNumber: obj.phoneNumber,
-        customersAttendedTo: obj.customersAttendedTo,
-        totalGemsGainedForCustomers: obj.totalGemsGainedForCustomers,
-        totalGemsRedeemedForCustomers: obj.totalGemsRedeemedForCustomers
+        // customersAttendedTo: obj.customersAttendedTo,
+        // totalGemsGainedForCustomers: obj.totalGemsGainedForCustomers,
+        // totalGemsRedeemedForCustomers: obj.totalGemsRedeemedForCustomers
     };
 }
 
@@ -117,8 +117,9 @@ export default function Cashiers() {
     });
 
     useEffect(() => {
+        const url = isSuperAdmin() ? `/api/merchant` : `/api/merchant?vendorId=${getUserData().vendor}`;
         createAxiosInstance()
-            .get(`/merchant/all?id=${getUserData().vendor}`)
+            .get(url)
             .then(res => {
                 const cashiers = [];
                 res.data.forEach(data => {
@@ -138,7 +139,7 @@ export default function Cashiers() {
         setError(false);
         data.vendor = getUserData().vendor;
         createAxiosInstance()
-            .post("/merchant/register", data)
+            .post("/api/merchant/register", data)
             .then(res => {
                 setSaving(false);
                 setSaved(true);
@@ -157,7 +158,7 @@ export default function Cashiers() {
 
     const getCashier = id => {
         createAxiosInstance()
-            .get(`/merchant?id=${id}`)
+            .get(`/api/merchant?id=${id}`)
             .then(res => {
                 console.log(res.data);
                 setCashier(createSingleData(res.data));
@@ -186,7 +187,7 @@ export default function Cashiers() {
         setSaved(false);
         setError(false);
         createAxiosInstance()
-            .post(`/merchant/update`, cashier)
+            .post(`/api/merchant/update`, cashier)
             .then(res => {
                 setSaving(false);
                 setSaved(true);
@@ -255,10 +256,6 @@ export default function Cashiers() {
         header: {
             actions: "Actions"
         }
-    };
-
-    const sortByDate = _ => {
-        
     };
 
     return (

@@ -22,7 +22,7 @@ export default function StatCard(props) {
         <Paper style={cardStyle}>
             <Chip size="small" style={{ ...chipStyle, width: "100%" }} label={props.tag} />
             <Typography style={{ bottom: 0 }} variant="h6" component="h5">
-                ₦ {props.value}
+                {props.value}
             </Typography>
         </Paper>
     );
